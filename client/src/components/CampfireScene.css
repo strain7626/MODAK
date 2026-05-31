@@ -30,6 +30,7 @@
 
 .fire {
   position: relative;
+  z-index: 1;
   width: 60px;
   height: 80px;
   display: flex;
@@ -79,10 +80,51 @@
 
 .ember {
   width: 50px;
-  height: 12px;
+  height: 10px;
   background: radial-gradient(ellipse, #ff6600 0%, #8b2500 70%);
   border-radius: 50%;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* 장작 */
+.logs {
+  position: relative;
+  width: 80px;
+  height: 20px;
+  margin: -14px auto 0;
+  z-index: 3;
+}
+
+.log {
+  position: absolute;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to bottom, #6b3a1f, #3d1c08);
+  box-shadow: inset 0 2px 3px rgba(255,120,20,0.15);
+}
+
+.log1 {
+  width: 55px;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-25deg);
+}
+
+.log2 {
+  width: 60px;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%) rotate(10deg);
+}
+
+.log3 {
+  width: 50px;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-5deg);
+  background: linear-gradient(to bottom, #7a4020, #4a2010);
 }
 
 /* 참여자 */
@@ -115,24 +157,117 @@
   text-align: center;
 }
 
-/* 말풍선 */
-.bubble {
+/* 말풍선 스택 */
+.bubble-stack {
   position: absolute;
-  bottom: 54px;
+  bottom: 76px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+/* 버블 등장 래퍼 — 높이를 천천히 키워 기존 버블을 두둥실 밀어 올림 */
+.bubble-entry-wrapper {
+  overflow: visible;
+  max-height: 0;
+  transition: max-height 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bubble-entry-wrapper.expanded {
+  max-height: 120px;
+}
+
+/* 생각풍선 */
+.thinking-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thinking-bubble {
+  background: rgba(255, 240, 200, 0.92);
+  border-radius: 16px;
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.thinking-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #5a2500;
+  animation: thinking-bounce 1.1s ease-in-out infinite;
+}
+.thinking-dot:nth-child(2) { animation-delay: 0.18s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes thinking-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.thinking-trail {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 3px;
+}
+
+.trail-dot {
+  border-radius: 50%;
+  background: rgba(255, 240, 200, 0.88);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.trail-dot:nth-child(1) { width: 6px; height: 6px; }
+.trail-dot:nth-child(2) { width: 4px; height: 4px; opacity: 0.7; }
+
+/* 말풍선 */
+.bubble {
+  position: relative;
   background: rgba(255, 240, 200, 0.92);
   color: #2a0f00;
   padding: 6px 12px;
   border-radius: 14px;
   font-size: 13px;
-  white-space: nowrap;
-  max-width: 180px;
   white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  width: max-content;
+  max-width: 180px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
   opacity: 0;
-  transition: opacity 0.3s, transform 1.5s ease-out;
+  transition: opacity 0.25s ease, transform 0.7s ease-out;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid rgba(255, 240, 200, 0.92);
+  display: none;
+}
+
+.bubble-entry-wrapper:last-child .bubble::after {
+  display: block;
 }
 
 .bubble-enter {
@@ -141,5 +276,5 @@
 
 .bubble-fade {
   opacity: 0;
-  transform: translateX(-50%) translateY(-30px);
+  transform: translateY(-30px);
 }

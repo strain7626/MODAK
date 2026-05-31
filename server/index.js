@@ -19,8 +19,19 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/rooms', require('./routes/rooms'));
 
-// roomId → Set of { userId, nickname, avatar, socketId }
+// roomId → Map<socketId, { userId, nickname, socketId }>
 const roomPresence = new Map();
+
+// userId 기준으로 중복 제거한 presence 반환
+const getUniquePresence = (roomId) => {
+  const sockets = roomPresence.get(roomId);
+  if (!sockets) return [];
+  const byUser = new Map();
+  for (const entry of sockets.values()) {
+    byUser.set(entry.userId, entry);
+  }
+  return [...byUser.values()];
+};
 
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
@@ -44,7 +55,12 @@ io.on('connection', (socket) => {
       socketId: socket.id,
     });
 
-    io.to(roomId).emit('presence_update', [...roomPresence.get(roomId).values()]);
+    io.to(roomId).emit('presence_update', getUniquePresence(roomId));
+    socket.to(roomId).emit('user_joined', { nickname: socket.user.nickname });
+  });
+
+  socket.on('typing', ({ roomId, isTyping }) => {
+    socket.to(roomId).emit('user_typing', { userId: socket.user.id, isTyping });
   });
 
   socket.on('send_message', async ({ roomId, content }) => {
@@ -55,7 +71,6 @@ io.on('connection', (socket) => {
         content,
       });
       const populated = await message.populate('sender', 'nickname avatar');
-
       io.to(roomId).emit('new_message', populated);
     } catch (err) {
       socket.emit('error', '메시지 전송 실패');
@@ -66,7 +81,7 @@ io.on('connection', (socket) => {
     const roomId = socket.currentRoom;
     if (roomId && roomPresence.has(roomId)) {
       roomPresence.get(roomId).delete(socket.id);
-      io.to(roomId).emit('presence_update', [...roomPresence.get(roomId).values()]);
+      io.to(roomId).emit('presence_update', getUniquePresence(roomId));
     }
   });
 });

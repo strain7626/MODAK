@@ -16,7 +16,7 @@ export default function Login() {
     setError('');
     try {
       const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
-      const { data } = await axios.post(`http://localhost:5000${endpoint}`, { nickname, password });
+      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}${endpoint}`, { nickname, password });
       login(data.user, data.token);
       navigate('/');
     } catch (err) {

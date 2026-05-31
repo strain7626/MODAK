@@ -13,7 +13,7 @@ export function SocketProvider({ children }) {
     if (!user) return;
 
     const token = localStorage.getItem('modak_token');
-    socketRef.current = io('http://localhost:5000', { auth: { token } });
+    socketRef.current = io(import.meta.env.VITE_API_URL, { auth: { token } });
     socketRef.current.on('connect', () => setConnected(true));
     socketRef.current.on('disconnect', () => setConnected(false));
 

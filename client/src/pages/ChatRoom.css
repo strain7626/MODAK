@@ -13,6 +13,7 @@
   padding: 12px 16px;
   background: rgba(255, 100, 20, 0.1);
   border-bottom: 1px solid rgba(255, 120, 20, 0.2);
+  flex-shrink: 0;
 }
 
 .chatroom-header h2 {
@@ -42,34 +43,94 @@
   gap: 8px;
 }
 
-.chat-scroll {
+/* ── 메인 영역 ── */
+.main-area {
   flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 캠프파이어 배경 */
+.campfire-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+/* 패널 열릴 때 캠프파이어 뒤로 물러남 */
+.campfire-bg.dimmed {
+  transform: translateY(32px);
+  opacity: 0.5;
+}
+
+/* 히스토리 패널: 평소엔 위에 숨어있다가 슬라이드 다운 */
+.history-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  z-index: 2;
   overflow-y: auto;
-  scroll-behavior: smooth;
-}
-
-.chat-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-
-.chat-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 120, 20, 0.3);
-  border-radius: 2px;
-}
-
-/* 히스토리 */
-.history-section {
-  padding: 16px;
   display: flex;
   flex-direction: column;
+  padding: 16px;
   gap: 8px;
-  min-height: 300px;
+  background: rgba(10, 3, 0, 0.55);
+  transform: translateY(-100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.history-panel.open {
+  transform: translateY(0);
+}
+
+/* 스크롤바 */
+.history-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.history-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 120, 20, 0.35);
+  border-radius: 2px;
+}
+.history-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 메시지를 하단으로 밀어내는 스페이서 */
+.history-spacer {
+  flex: 1;
+}
+
+/* 빈 히스토리 안내 */
+.empty-history {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255, 180, 80, 0.45);
+  font-size: 14px;
+  text-align: center;
+}
+
+.empty-history span {
+  font-size: 32px;
+}
+
+.empty-history p {
+  margin: 0;
+}
+
+/* 메시지 */
 .msg-row {
   display: flex;
   flex-direction: column;
   max-width: 70%;
+  align-self: flex-start;
+  align-items: flex-start;
 }
 
 .msg-row.mine {
@@ -97,11 +158,59 @@
   border-color: rgba(255, 120, 20, 0.4);
 }
 
-/* 모닥불 실시간 씬 */
-.campfire-section {
-  height: 70vh;
-  min-height: 400px;
-  position: relative;
+/* 라이브 모드 스크롤 힌트 */
+.scroll-hint {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: rgba(255, 180, 80, 0.5);
+  letter-spacing: 0.05em;
+  z-index: 10;
+  animation: hint-pulse 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.3; transform: translateX(-50%) translateY(0); }
+  50%       { opacity: 0.8; transform: translateX(-50%) translateY(-4px); }
+}
+
+/* 입장 알림 */
+.join-notif-area {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.join-notif {
+  background: rgba(20, 8, 0, 0.7);
+  border: 1px solid rgba(255, 140, 40, 0.3);
+  color: rgba(255, 200, 100, 0.9);
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  animation: notif-in 0.3s ease-out;
+}
+
+.join-notif.fading {
+  opacity: 0;
+}
+
+@keyframes notif-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* 입력창 */
@@ -111,6 +220,7 @@
   padding: 12px 16px;
   background: rgba(255, 80, 10, 0.08);
   border-top: 1px solid rgba(255, 120, 20, 0.2);
+  flex-shrink: 0;
 }
 
 .chat-input input {

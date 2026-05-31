@@ -16,7 +16,7 @@ export default function Home() {
   }, []);
 
   const fetchRooms = async () => {
-    const { data } = await axios.get('http://localhost:5000/api/rooms', {
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/rooms`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     setRooms(data);
@@ -25,7 +25,7 @@ export default function Home() {
   const createRoom = async (e) => {
     e.preventDefault();
     if (!newRoomName.trim()) return;
-    await axios.post('http://localhost:5000/api/rooms', { name: newRoomName }, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/rooms`, { name: newRoomName }, {
       headers: { Authorization: `Bearer ${token}` }
     });
     setNewRoomName('');
@@ -36,7 +36,7 @@ export default function Home() {
     e.preventDefault();
     if (!inviteCode.trim()) return;
     try {
-      await axios.post(`http://localhost:5000/api/rooms/join/${inviteCode}`, {}, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/rooms/join/${inviteCode}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setInviteCode('');
